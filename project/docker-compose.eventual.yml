@@ -1,0 +1,9 @@
+# Docker Compose configuration for EVENTUAL consistency mode (Gossip)
+# Usage: docker compose -f docker-compose.eventual.yml up --build
+#
+# This file is identical to docker-compose.yml except MODE=EVENTUAL
+# Use this to test your Gossip implementation
+
+services:
+  # TODO: Define services node1, node2, node3
+  # See docker-compose.yml for reference
