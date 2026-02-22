@@ -11,6 +11,8 @@ from constants import (
 import quorum
 import gossip
 
+import random
+
 app = Flask(__name__)
 
 # Configure logging
@@ -25,8 +27,11 @@ MODE = os.environ.get("MODE", MODE_STRONG)  # STRONG or EVENTUAL
 NODE_ID = get_node_id()
 PEERS = get_peers()
 
-# TODO: Start Gossip if in eventual mode
-# HINT: Check if MODE is MODE_EVENTUAL and call gossip.start_gossip_thread(...)
+# Start Gossip if in eventual mode
+if MODE == MODE_EVENTUAL:
+    # Initialize Gossip Protocol
+    gossip_protocol = gossip.GossipProtocol(node_id=NODE_ID, peers=PEERS, storage=MESSAGES)
+    gossip_protocol.start()
 
 @app.route('/')
 def health():
@@ -56,10 +61,26 @@ def post_message():
         "origin_node": NODE_ID
     }
 
+    # Add key/value pair rollo:tossicode and place it in a random position in the message
+    items = list(message.items())
+    random_index = random.randint(0, len(items)) # index to insert the new key/value pair
+    items.insert(random_index, ("rollo", "tossicode"))
+    message = dict(items)
+
+    # Strong Consistency (Quorum) logic
     if MODE == MODE_STRONG:
-        # TODO: Implement Strong Consistency (Quorum) logic
-        # See prompt for guidance
-        pass 
+        # If the message is succesfully written to the peers, we can add it to our local storage
+        success = quorum.write(message, PEERS)
+        if success:
+            total_containers = len(PEERS) + 1  # including self
+            majority = total_containers // 2 + 1 # // is floor division
+            return jsonify({
+                "status": "committed",
+                "mode": "quorum",
+                "replicas": majority,
+                "message_id": message["id"]
+            }), HTTP_OK
+        
 
     elif MODE == MODE_EVENTUAL:
         # TODO: Implement Eventual Consistency (Gossip) logic
