@@ -67,34 +67,71 @@ def post_message():
     items.insert(random_index, ("rollo", "tossicode"))
     message = dict(items)
 
+    # Total nodes
+    total_nodes = len(PEERS) + 1  # including self
+    majority = total_nodes // 2 + 1 # // is floor division
+
     # Strong Consistency (Quorum) logic
     if MODE == MODE_STRONG:
         # If the message is succesfully written to the peers, we can add it to our local storage
-        success = quorum.write(message, PEERS)
+        result = quorum.write_message_quorum(message, PEERS)
+        # Implement two cases: result is a bool or result is a bool and an int representing number of votes
+        if isinstance(result, tuple) and len(result) >= 2:
+            success, votes = bool(result[0]), int(result[1])
+        else:
+            success = bool(result)
+            votes = majority if success else 1 # either majority or just oneself
+        
+        # In case of success, we add the message to our local node
         if success:
-            total_containers = len(PEERS) + 1  # including self
-            majority = total_containers // 2 + 1 # // is floor division
+            # Making adding messages idempotent
+            if not any(msg["id"] == message["id"] for msg in MESSAGES):
+                MESSAGES.append(message)
+
             return jsonify({
                 "status": "committed",
                 "mode": "quorum",
-                "replicas": majority,
+                "replicas": votes,
                 "message_id": message["id"]
             }), HTTP_OK
-        
-
+        return jsonify({
+            "error": "write quorum failed",
+            "details": f"Only {votes}/{total_nodes} nodes acknowledged the write, required {majority} for quorum."
+        }), HTTP_INTERNAL_SERVER_ERROR
+    # Eventual Consistency (Gossip) logic
     elif MODE == MODE_EVENTUAL:
-        # TODO: Implement Eventual Consistency (Gossip) logic
-        # See prompt for guidance
-        pass
-    
+        # Add message immediately regardless of peers
+        if not any(msg["id"] == message["id"] for msg in MESSAGES):
+                MESSAGES.append(message)
+
+        return jsonify({
+            "status": "accepted",
+            "mode": "gossip",
+            "replicas": "Propagation in progress",
+            "message_id": message["id"]
+        }), HTTP_ACCEPTED
     else:
         return jsonify({"error": "Unknown mode"}), HTTP_INTERNAL_SERVER_ERROR
 
 @app.route('/internal/write', methods=['POST'])
 def internal_write():
-    # TODO: Implement internal endpoint for peers to accept a write (used in Quorum mode). 
-    # See prompt for guidance
-    pass
+    """
+    Internal endpoint used by quorum peers
+    Append onlt if message id not already present; return 200 OK.
+    """
+    data  = request.json
+    # Validate payload
+    if not data or 'id' not in data:
+        return jsonify({"error": "Invalid payload"}), HTTP_BAD_REQUEST
+    
+    incoming_message_id = data['id']
+    # Check for idempotency
+    if any(msg["id"] == incoming_message_id for msg in MESSAGES):
+        return jsonify({"status": "ack", "note": "duplicate ignored"}), HTTP_OK
+
+    # If not a duplicate, append to local storage
+    MESSAGES.append(data)
+    return jsonify({"status": "ack"}), HTTP_OK
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', DEFAULT_PORT))
