@@ -1,3 +1,6 @@
+# Author: Gilad Bitton
+# RedID: 130621085
+
 from flask import Flask, request, jsonify
 import os
 import uuid

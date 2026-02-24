@@ -1,3 +1,6 @@
+# Author: Gilad Bitton
+# RedID: 130621085
+
 import time
 import threading
 import random
@@ -23,6 +26,9 @@ class GossipProtocol:
         thread.start()
 
     def gossip_loop(self):
+        """
+        Main loop for the gossip protocol. Periodically selects a random peer and syncs messages.
+        """
         logger.info("Gossip protocol started.")
         while self.running:
             # Random sleep within bounds

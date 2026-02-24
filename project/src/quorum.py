@@ -1,3 +1,6 @@
+# Author: Gilad Bitton
+# RedID: 130621085
+
 import requests
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -78,6 +81,7 @@ def _send_write_request(peer_url: str, message) -> bool:
     Returns True if peer responds with HTTP_OK
     """
     try:
+        # We use a POST request to the peer's /internal/write endpoint with the message as JSON payload
         response = requests.post(
             f"{peer_url}/internal/write",
             json=message,
@@ -85,8 +89,10 @@ def _send_write_request(peer_url: str, message) -> bool:
         )
         return response.status_code == HTTP_OK
     except requests.exceptions.Timeout:
+        # Log timeout and treat as failure
         logger.warning("Timeout contacting peer %s", peer_url)
         return False
     except requests.exceptions.RequestException as e:
+        # Log any other request exceptions and treat as failure
         logger.warning("Error contacting peer %s: %s", peer_url, e)
         return False

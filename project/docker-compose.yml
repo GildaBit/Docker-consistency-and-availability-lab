@@ -1,13 +1,10 @@
+# Author: Gilad Bitton
+# RedID: 130621085
+
 # Docker Compose file for CS496 Week 3 Chat Service Cluster
 # Note: The 'version' key is obsolete in Docker Compose V2 and can be omitted
 
 services:
-  # TODO: Define services node1, node2, node3
-  # HINT: Use the Dockerfile you created (build: .)
-  # HINT: Map ports 5001:5000, 5002:5000, etc.
-  # HINT: Set environment variables NODE_ID, MODE, PEERS
-  # 
-  # Example structure for one node:
   node1:
     build: .
     environment:
