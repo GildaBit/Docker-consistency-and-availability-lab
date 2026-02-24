@@ -64,12 +64,6 @@ def post_message():
         "origin_node": NODE_ID
     }
 
-    # Add key/value pair rollo:tossicode and place it in a random position in the message
-    items = list(message.items())
-    random_index = random.randint(0, len(items)) # index to insert the new key/value pair
-    items.insert(random_index, ("rollo", "tossicode"))
-    message = dict(items)
-
     # Total nodes
     total_nodes = len(PEERS) + 1  # including self
     majority = total_nodes // 2 + 1 # // is floor division
