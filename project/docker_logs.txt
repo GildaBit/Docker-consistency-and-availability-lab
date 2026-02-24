@@ -1,0 +1,21 @@
+node1-1  |  * Serving Flask app 'app'
+node3-1  |  * Serving Flask app 'app'
+node3-1  |  * Debug mode: off
+node3-1  | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+node3-1  |  * Running on all addresses (0.0.0.0)
+node3-1  |  * Running on http://127.0.0.1:5000
+node3-1  |  * Running on http://172.18.0.4:5000
+node3-1  | INFO:werkzeug:[33mPress CTRL+C to quit[0m
+node2-1  |  * Serving Flask app 'app'
+node2-1  |  * Debug mode: off
+node2-1  | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+node2-1  |  * Running on all addresses (0.0.0.0)
+node2-1  |  * Running on http://127.0.0.1:5000
+node2-1  |  * Running on http://172.18.0.2:5000
+node2-1  | INFO:werkzeug:[33mPress CTRL+C to quit[0m
+node1-1  |  * Debug mode: off
+node1-1  | INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+node1-1  |  * Running on all addresses (0.0.0.0)
+node1-1  |  * Running on http://127.0.0.1:5000
+node1-1  |  * Running on http://172.18.0.3:5000
+node1-1  | INFO:werkzeug:[33mPress CTRL+C to quit[0m
